@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Train</string>
+    <string name="edit_message">Location</string>
+    <string name="button_save_location">Save</string>
+    <string name="button_get_location">Get Location</string>
+    <string name="no_location_detected">Sorry, no location detected</string>
+</resources>
