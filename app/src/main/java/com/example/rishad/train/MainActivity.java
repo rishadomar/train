@@ -3,8 +3,10 @@ package com.example.rishad.train;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.TextView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -28,6 +30,8 @@ public class MainActivity extends AppCompatActivity implements
     protected Location mLastLocation;
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
+    protected Button mGetButtonLocationButton;
+    protected Button mSaveLocationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,13 @@ public class MainActivity extends AppCompatActivity implements
 
         mLatitudeText = (TextView) findViewById((R.id.gpsLatitude));
         mLongitudeText = (TextView) findViewById((R.id.gpsLongitude));
+        mGetButtonLocationButton = (Button) findViewById(R.id.buttonGetLocation);
+        mGetButtonLocationButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                MainActivity.this.clickHandler();
+                Log.i(TAG, "Button pressed hhhhh");
+            }
+        });
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -44,6 +55,24 @@ public class MainActivity extends AppCompatActivity implements
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+        }
+    }
+
+    protected void clickHandler()
+    {
+        //Toast.makeText(getApplicationContext(), "Button clicked 2", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Button clicked 4", Toast.LENGTH_LONG).show();
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null) {
+            mLatitudeText.setText(String.format("%f",
+                    mLastLocation.getLatitude()));
+            mLongitudeText.setText(String.format("%f",
+                    mLastLocation.getLongitude()));
+            String s = String.format("Lat long = %f, %f",
+                    mLastLocation.getLatitude(),
+                    mLastLocation.getLongitude());
+        } else {
+            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -68,20 +97,6 @@ public class MainActivity extends AppCompatActivity implements
         // applications that do not require a fine-grained location and that do not need location
         // updates. Gets the best and most recent location currently available, which may be null
         // in rare cases when a location is not available.
-        Log.i(TAG, "eeeeeeeekkkkkkkkkkkk just connected");
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            mLatitudeText.setText(String.format("%f",
-                    mLastLocation.getLatitude()));
-            mLongitudeText.setText(String.format("%f",
-                    mLastLocation.getLongitude()));
-            String s = String.format("Lat long = %f, %f",
-                mLastLocation.getLatitude(),
-                mLastLocation.getLongitude());
-            Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override
