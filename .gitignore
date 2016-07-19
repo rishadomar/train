@@ -1,0 +1,9 @@
+1.diff
+do_commit.sh
+*.iml
+.gradle
+/local.properties
+.idea
+.DS_Store
+/build
+/captures
