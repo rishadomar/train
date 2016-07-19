@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mLatitudeText = (TextView) findViewById((R.id.gpsLatitude));
+        mLongitudeText = (TextView) findViewById((R.id.gpsLongitude));
+
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
