@@ -21,6 +21,9 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity implements
         ConnectionCallbacks, OnConnectionFailedListener {
 
@@ -35,29 +38,15 @@ public class MainActivity extends AppCompatActivity implements
      * Represents a geographical location.
      */
     protected Location mLastLocation;
-    protected TextView mLatitudeText;
-    protected TextView mLongitudeText;
+    protected TextView mYouAreHereText;
     protected Button mWhereamiButton;
-    protected Button mGetButtonLocationButton;
-    protected Button mSaveLocationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mLatitudeText = (TextView) findViewById((R.id.gpsLatitude));
-        mLongitudeText = (TextView) findViewById((R.id.gpsLongitude));
-
-        //
-        // Setup the getlocation button
-        //
-        mGetButtonLocationButton = (Button) findViewById(R.id.buttonGetLocation);
-        mGetButtonLocationButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                MainActivity.this.clickHandler();
-            }
-        });
+        mYouAreHereText = (TextView) findViewById((R.id.youAreHere));
 
         //
         // Setup the whereami button
@@ -104,7 +93,18 @@ public class MainActivity extends AppCompatActivity implements
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
                         System.out.println("response is: " + response);
-                        //System.out.println(response.substring(0,100));
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            String station1 = json.getString("Station1");
+                            String station2 = json.getString("Station2");
+                            if (station1.equals(station2)) {
+                                mYouAreHereText.setText("You are here: " + station1);
+                            } else {
+                                mYouAreHereText.setText("You are between: " + station1 + " and " + station2);
+                            }
+                        } catch (JSONException e) {
+                            mYouAreHereText.setText("Unable to parse response");
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -115,25 +115,6 @@ public class MainActivity extends AppCompatActivity implements
         });
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
-    }
-
-
-    protected void clickHandler()
-    {
-        //Toast.makeText(getApplicationContext(), "Button clicked 2", Toast.LENGTH_LONG).show();
-        //Toast.makeText(this, "Button clicked 4", Toast.LENGTH_LONG).show();
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            mLatitudeText.setText(String.format("%f",
-                    mLastLocation.getLatitude()));
-            mLongitudeText.setText(String.format("%f",
-                    mLastLocation.getLongitude()));
-            String s = String.format("Lat long = %f, %f",
-                    mLastLocation.getLatitude(),
-                    mLastLocation.getLongitude());
-        } else {
-            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
-        }
     }
 
     protected void onStart() {

@@ -6,37 +6,14 @@
     android:layout_height="wrap_content">
 
     <Button
-        android:id="@+id/buttonGetLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_get_location" />
-
-    <TextView
-        android:id="@+id/gpsLatitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/gpsLongitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/editLocationName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="@string/edit_message"/>
-
-    <Button
-        android:id="@+id/buttonSaveLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_save_location"/>
-
-    <Button
         android:id="@+id/buttonWhereami"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_whereami"/>
+
+    <TextView
+        android:id="@+id/youAreHere"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
