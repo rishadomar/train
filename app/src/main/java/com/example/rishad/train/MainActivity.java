@@ -9,6 +9,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -19,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements
         ConnectionCallbacks, OnConnectionFailedListener {
 
     protected static final String TAG = "MainActivity";
+    protected static final String BaseUrl = "http://52.3.249.119:8083";
     /**
      * Provides the entry point to Google Play services.
      */
@@ -30,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements
     protected Location mLastLocation;
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
+    protected Button mWhereamiButton;
     protected Button mGetButtonLocationButton;
     protected Button mSaveLocationButton;
 
@@ -40,11 +48,24 @@ public class MainActivity extends AppCompatActivity implements
 
         mLatitudeText = (TextView) findViewById((R.id.gpsLatitude));
         mLongitudeText = (TextView) findViewById((R.id.gpsLongitude));
+
+        //
+        // Setup the getlocation button
+        //
         mGetButtonLocationButton = (Button) findViewById(R.id.buttonGetLocation);
         mGetButtonLocationButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 MainActivity.this.clickHandler();
-                Log.i(TAG, "Button pressed hhhhh");
+            }
+        });
+
+        //
+        // Setup the whereami button
+        //
+        mWhereamiButton = (Button) findViewById(R.id.buttonWhereami);
+        mWhereamiButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                MainActivity.this.whereamiClickHandler();
             }
         });
 
@@ -57,6 +78,45 @@ public class MainActivity extends AppCompatActivity implements
                     .build();
         }
     }
+
+    protected void whereamiClickHandler()
+    {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation == null) {
+            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
+            return;
+        }
+        double latitude = mLastLocation.getLatitude();
+        double longitude = mLastLocation.getLongitude();
+        String url = BaseUrl + "/whereami?latitude=" +
+                String.format("%f", latitude) +
+                "&longitude=" +
+                String.format("%f", longitude);
+        System.out.println("Making request ...");
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        System.out.println("response is: " + response);
+                        //System.out.println(response.substring(0,100));
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("Eek Something went wrong!");
+                error.printStackTrace();
+            }
+        });
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
+    }
+
 
     protected void clickHandler()
     {

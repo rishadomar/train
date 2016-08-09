@@ -1,0 +1,9 @@
+1) Install train service on some server
+
+2) Make api call from app to service
+
+3) make the whereami call from app
+
+4) display result of api on app
+
+5)
