@@ -19,13 +19,15 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements
-        ConnectionCallbacks, OnConnectionFailedListener {
+        ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
     protected static final String TAG = "MainActivity";
     protected static final String BaseUrl = "http://52.3.249.119:8083";
@@ -40,6 +42,20 @@ public class MainActivity extends AppCompatActivity implements
     protected Location mLastLocation;
     protected TextView mYouAreHereText;
     protected Button mWhereamiButton;
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+    // Update frequency in seconds
+    public static final int UPDATE_INTERVAL_IN_SECONDS = 120;
+    // Update frequency in milliseconds
+    private static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND
+            * UPDATE_INTERVAL_IN_SECONDS;
+    // The fastest update frequency, in seconds
+    private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
+    // A fast frequency ceiling in milliseconds
+    private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND
+            * FASTEST_INTERVAL_IN_SECONDS;
+    //private LocationClient locationClient;
+    private LocationRequest mlocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +93,10 @@ public class MainActivity extends AppCompatActivity implements
         }
         double latitude = mLastLocation.getLatitude();
         double longitude = mLastLocation.getLongitude();
+        displayMyLocation(latitude, longitude);
+    }
+
+    private void displayMyLocation(double latitude, double longitude) {
         String url = BaseUrl + "/whereami?latitude=" +
                 String.format("%f", latitude) +
                 "&longitude=" +
@@ -115,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements
         });
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
+
     }
 
     protected void onStart() {
@@ -134,10 +155,12 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onConnected(Bundle connectionHint) {
-        // Provides a simple way of getting a device's location and is well suited for
-        // applications that do not require a fine-grained location and that do not need location
-        // updates. Gets the best and most recent location currently available, which may be null
-        // in rare cases when a location is not available.
+        startLocationUpdates();
+    }
+
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
     }
 
     @Override
@@ -156,4 +179,8 @@ public class MainActivity extends AppCompatActivity implements
         mGoogleApiClient.connect();
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        displayMyLocation(location.getLatitude(), location.getLongitude());
+    }
 }
